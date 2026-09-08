@@ -10,8 +10,8 @@ from app.models.order_item import OrderItem
 from app.models.product import Product
 from app.schemas.order import OrderCreate, OrderResponse
 from app.models.order_status_history import OrderStatusHistory
-from app.models.order_status_history import OrderStatusHistory
 from app.schemas.order_status import OrderStatusUpdate
+import uuid
 
 
 
@@ -93,17 +93,20 @@ def create_order(
         })
 
     # 4. Generate order number
+    order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+
     new_order = Order(
+    order_number=order_number,
     customer_id=order_data.customer_id,
     status="PENDING",
     total_amount=total_amount,
     currency=order_data.currency
-)
+)   
 
     db.add(new_order)
     db.flush()
 
-    new_order.order_number = f"ORD-{new_order.id + 1000}"
+   
 
     status_history = OrderStatusHistory(
     order_id=new_order.id,
